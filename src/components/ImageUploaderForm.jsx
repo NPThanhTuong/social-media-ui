@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button"; // Shadcn/UI Button component
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormField,
@@ -13,16 +13,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "./ui/input";
 import { Image } from "lucide-react";
+import axios from "axios";
+import { axiosInstance } from "@/configs/axiosConfig";
+import { useToast } from "@/hooks/use-toast";
+import { useDialog } from "./UploadPostDialogProvider";
+import { InfinitySpin } from "react-loader-spinner";
+import Loading from "./Loading";
 
-// Define your form schema using Zod (optional)
 const formSchema = z.object({
   content: z.string(),
 });
 
-const ImageUploaderForm = () => {
+const ImageUploaderForm = ({ onChangeDialog }) => {
   const [selectedImages, setSelectedImages] = useState([]);
+  const [loading, setLoading] = useState(null);
+  const { toast } = useToast();
 
-  // React Hook Form Setup
   const form = useForm({
     resolver: zodResolver(formSchema),
   });
@@ -41,10 +47,50 @@ const ImageUploaderForm = () => {
   };
 
   // Submit the selected images and form data
-  const handleSubmit = (data) => {
-    console.log("Form data: ", data);
-    console.log("Uploaded images: ", selectedImages);
-    // Perform submission logic here (e.g., send form data and images to server)
+  const handleSubmit = async (data) => {
+    const uploadPromises = selectedImages.map((image) => {
+      const formData = new FormData();
+      formData.append("file", image.file);
+      formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET);
+      formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+      formData.append("api_key", import.meta.env.VITE_CLOUDINARY_API_KEY);
+
+      return axios.post(
+        "https://api.cloudinary.com/v1_1/dmcqr73g4/image/upload",
+        formData
+      );
+    });
+
+    try {
+      setLoading(true);
+      const resCloudinary = await Promise.all(uploadPromises);
+      const uploadedUrls = resCloudinary.map((response) => ({
+        path: response.data.secure_url,
+      }));
+
+      // Need change
+      const res = await axiosInstance.post(
+        "/posts/user/1",
+        {
+          content: data?.content,
+          images: uploadedUrls,
+        }
+        // {
+        //   headers: {
+        //     Authorization:""
+        //   },
+        // }
+      );
+
+      setLoading(false);
+      onChangeDialog(false);
+      toast({
+        title: "Thành công",
+        description: "Bài viết đã được đăng tải!",
+      });
+    } catch (error) {
+      console.error("Error uploading images", error);
+    }
   };
 
   // Remove a previewed image
@@ -52,10 +98,13 @@ const ImageUploaderForm = () => {
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        {/* Text Fields */}
         <FormField
           control={form.control}
           name="content"
@@ -113,7 +162,7 @@ const ImageUploaderForm = () => {
 
         {/* Submit Button */}
         <Button type="submit" className="mt-4 w-full">
-          Đăng bài
+          Đăng tải
         </Button>
       </form>
     </Form>
