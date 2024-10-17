@@ -28,7 +28,7 @@ export default function Friends({ type, list, handleConfirm }) {
                         <button className="bg-gray-300 mt-2 px-4 py-1 rounded" onClick={(e) => handleDelete(e, id)}>Xóa</button>
                     </>
                 ) : type === "requestsSent" ? (
-                    <button className="bg-gray-300 mt-2 px-4 py-1 rounded ">Xóa</button>
+                    <button className="bg-gray-300 mt-2 px-4 py-1 rounded" onClick={(e) => handleDelete(e, id)}>Xóa</button>
                 ) : null}
             </Link>
         );

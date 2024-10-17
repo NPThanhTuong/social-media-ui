@@ -27,7 +27,7 @@ function MenuSidebar() {
         </Link>
       </Button>
       <Button asChild variant="ghost" className="w-full justify-start p-6">
-        <Link to="/user/friends/all" className="flex items-center gap-3">
+        <Link to="/user/friends/friends" className="flex items-center gap-3">
           <div className="flex justify-center w-10">
             <Users size={25} />
           </div>
