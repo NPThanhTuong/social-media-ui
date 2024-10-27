@@ -10,15 +10,17 @@ import {
 
 import ImageUploaderForm from "@/components/ImageUploaderForm";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 function CreatePost() {
   const [openDialog, setOpenDialog] = useState(false);
+  const { user } = useAuth();
 
   return (
     <div className="p-4 bg-secondary border rounded-md">
       <div className="flex items-center gap-4">
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={user.avatar} />
           <AvatarFallback className="bg-background">N/A</AvatarFallback>
         </Avatar>
 

@@ -20,9 +20,10 @@ import {
 import { MessageCircleMore } from "lucide-react";
 import { Link } from "react-router-dom";
 import Search from "@/components/Search";
+import { useAuth } from "@/context/AuthContext";
 
 function Header() {
-  const [userLogin, setUserLogin] = useState(true);
+  const { user, logout, isLoggedIn } = useAuth();
 
   const { theme } = useTheme(); // Get the current theme (light, dark, system)
 
@@ -33,8 +34,8 @@ function Header() {
     return darkLogo;
   };
 
-  const handleLogout = () => {
-    console.log("Logout");
+  const handleLogout = (event) => {
+    logout();
   };
 
   return (
@@ -45,11 +46,13 @@ function Header() {
     >
       <div className="container mx-auto flex items-center justify-between py-4">
         <div className="flex justify-start items-center gap-4">
-          <img src={getLogo()} alt="Main logo" />
+          <Link to="/">
+            <img src={getLogo()} alt="Main logo" />
+          </Link>
           <Search />
         </div>
         <div className="flex justify-end items-center gap-4">
-          {userLogin ? (
+          {isLoggedIn() ? (
             <>
               <Popover>
                 <PopoverTrigger className="" asChild>
@@ -73,7 +76,7 @@ function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
-                    <AvatarImage src="https://github.com/shadcm.png" />
+                    <AvatarImage src={user.avatar} />
                     <AvatarFallback className="bg-background">
                       N/A
                     </AvatarFallback>
@@ -81,13 +84,13 @@ function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link to="/user/profile">Hồ sơ</Link>
+                    <Link to="/profile">Hồ sơ</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/user/friends">Bạn bè</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <div onClick={(e) => handleLogout()}>Đăng xuất</div>
+                    <div onClick={handleLogout}>Đăng xuất</div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

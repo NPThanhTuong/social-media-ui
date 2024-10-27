@@ -2,21 +2,29 @@ import { useEffect, useState } from "react";
 import Post from "@/components/Post";
 import { axiosInstance } from "@/configs/axiosConfig";
 import Loading from "./Loading";
+import { useAuth } from "@/context/AuthContext";
 
 function PostList() {
   const [posts, setPosts] = useState([]);
   const [likedPostId, setLikedPostId] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   useEffect(() => {
     const getData = async () => {
       try {
         // Need change
-        const userId = 1;
-        const resPost = await axiosInstance.get(`posts/user/${userId}/friends`);
-        const resLikedPostIds = await axiosInstance.get(
-          `posts/user/${userId}/liked/id`
-        );
+        const resPost = await axiosInstance.get(`posts/friends`, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+
+        const resLikedPostIds = await axiosInstance.get(`posts/liked/ids`, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
 
         const dataPost = resPost.data;
         const dataLikedPostIds = resLikedPostIds.data;
