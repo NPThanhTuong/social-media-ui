@@ -16,9 +16,8 @@ import { Image } from "lucide-react";
 import axios from "axios";
 import { axiosInstance } from "@/configs/axiosConfig";
 import { useToast } from "@/hooks/use-toast";
-import { useDialog } from "./UploadPostDialogProvider";
-import { InfinitySpin } from "react-loader-spinner";
 import Loading from "./Loading";
+import { useAuth } from "@/context/AuthContext";
 
 const formSchema = z.object({
   content: z.string(),
@@ -28,6 +27,7 @@ const ImageUploaderForm = ({ onChangeDialog }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [loading, setLoading] = useState(null);
   const { toast } = useToast();
+  const { token } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -70,16 +70,16 @@ const ImageUploaderForm = ({ onChangeDialog }) => {
 
       // Need change
       const res = await axiosInstance.post(
-        "/posts/user/1",
+        "/posts",
         {
           content: data?.content,
           images: uploadedUrls,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
         }
-        // {
-        //   headers: {
-        //     Authorization:""
-        //   },
-        // }
       );
 
       setLoading(false);

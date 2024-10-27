@@ -42,6 +42,7 @@ import LightGallery from "lightgallery/react";
 import { twMerge } from "tailwind-merge";
 import { axiosInstance } from "@/configs/axiosConfig";
 import CommentSystem from "./CommentSystem";
+import { useAuth } from "@/context/AuthContext";
 
 function Post({
   id,
@@ -53,6 +54,7 @@ function Post({
   createdAt,
   isLiked,
 }) {
+  const { token } = useAuth();
   const lightGallery = useRef(null);
   const MAX_VISIBLE_IMAGES = 4; // Limit to display before hiding the rest
   const visibleImages = images.slice(0, MAX_VISIBLE_IMAGES); // First 5 images
@@ -70,14 +72,19 @@ function Post({
 
   const handleClickLikePost = async (pressed) => {
     try {
-      // Need change
-      const userId = 1;
       const likeReactionId = 1;
-      const res = await axiosInstance.post(`/posts/user/${userId}/like`, {
-        postId: id,
-        reactionId: likeReactionId,
-      });
-      console.log(res.data);
+      const res = await axiosInstance.post(
+        `/posts/like`,
+        {
+          postId: id,
+          reactionId: likeReactionId,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -89,7 +96,6 @@ function Post({
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
             <Avatar>
-              {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
               <AvatarImage src={owner.avatar} />
               <AvatarFallback className="bg-background">N/A</AvatarFallback>
             </Avatar>
@@ -111,7 +117,7 @@ function Post({
               <DropdownMenuLabel>Tùy chọn</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Chỉnh sửa bài viết</DropdownMenuItem>
-              <DropdownMenuItem>Chuyển vào thùng rác</DropdownMenuItem>
+              <DropdownMenuItem>Ẩn bài viết</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

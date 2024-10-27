@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 function Comment({ comment, onEdit, onDelete, onAddReply }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newContent, setNewContent] = useState(comment.content);
   const [replyContent, setReplyContent] = useState("");
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const { user } = useAuth();
 
   // const handleEdit = () => {
   //   if (isEditing) {
@@ -40,7 +42,7 @@ function Comment({ comment, onEdit, onDelete, onAddReply }) {
           <div className="flex gap-4">
             <Avatar>
               {/* lay avatar cua user login */}
-              <AvatarImage src={null} />
+              <AvatarImage src={user.avatar} />
               <AvatarFallback className="bg-foreground text-background">
                 N/A
               </AvatarFallback>
@@ -85,7 +87,7 @@ function Comment({ comment, onEdit, onDelete, onAddReply }) {
         <div className="flex gap-4 mt-3 mb-6">
           <Avatar>
             {/* lay avatar cua user login */}
-            <AvatarImage src={null} />
+            <AvatarImage src={user.avatar} />
             <AvatarFallback className="bg-foreground text-background">
               N/A
             </AvatarFallback>
