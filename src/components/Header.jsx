@@ -21,6 +21,81 @@ import { MessageCircleMore } from "lucide-react";
 import { Link } from "react-router-dom";
 import Search from "@/components/Search";
 import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import ChatList from "@/components/ChatList";
+
+// Dữ liệu mẫu cho danh sách chat
+const dataChat = [
+  {
+    id: 1,
+    userName: "Người dùng B",
+    lastMessage: "Tin nhắn cuối!",
+    time: "12:00",
+    avatar: "https://api.multiavatar.com/user10.svg",
+    type: "private",
+    messages: [
+      {
+        sender: "Người dùng B",
+        text: "Chào bạn!",
+        timestamp: "2024-10-27T15:30:00.000Z",
+        avatar: "https://api.multiavatar.com/user10.svg",
+      },
+      {
+        sender: "Bạn",
+        text: "Xin chào, bạn có khỏe không?",
+        timestamp: "2024-10-27T15:32:00.000Z",
+      },
+      {
+        sender: "Người dùng B",
+        text: "Tôi khỏe, cảm ơn bạn! Bạn thì sao?",
+        timestamp: "2024-10-27T15:35:00.000Z",
+        avatar: "https://api.multiavatar.com/user10.svg",
+      },
+      {
+        sender: "Bạn",
+        text: "Tôi cũng khỏe. Cảm ơn bạn đã hỏi!",
+        timestamp: "2024-10-28T09:00:00.000Z",
+      },
+      {
+        sender: "Người dùng B",
+        text: "Hẹn gặp lại!",
+        timestamp: "2024-10-28T09:05:00.000Z",
+        avatar: "https://api.multiavatar.com/user10.svg",
+      },
+    ],
+  },
+  {
+    id: 2,
+    userName: "Nhóm B",
+    lastMessage: "Tin nhắn cuối cùng",
+    time: "12:19",
+    avatars: [
+      //   "https://api.multiavatar.com/user3.svg",
+      //   "https://api.multiavatar.com/user14.svg",
+    ],
+    messages: [
+      {
+        sender: "Người dùng 1",
+        text: "Chào mọi người!",
+        timestamp: "2024-10-28T15:30:00.000Z",
+        avatar: "https://api.multiavatar.com/user3.svg",
+      },
+      {
+        sender: "Người dùng 2",
+        text: "Chào bạn!",
+        timestamp: "2024-10-28T15:30:00.000Z",
+        avatar: "https://api.multiavatar.com/user14.svg",
+      },
+      {
+        sender: "Người dùng 1",
+        text: "Có ai muốn đi ăn trưa không?",
+        timestamp: "2024-10-28T15:30:00.000Z",
+        avatar: "https://api.multiavatar.com/user4.svg",
+      },
+    ],
+    type: "group",
+  },
+];
 
 function Header() {
   const { user, logout, isLoggedIn } = useAuth();
@@ -38,6 +113,20 @@ function Header() {
     logout();
   };
 
+  const [selectedChat, setSelectedChat] = useState(null);
+  const navigate = useNavigate();
+
+  // Hàm xử lý khi người dùng chọn một chat
+  const handleChatSelect = (chat) => {
+    setSelectedChat(chat);
+    localStorage.setItem("selectedChatId", chat.id); // Lưu chat đã chọn vào localStorage
+    navigate(`/messages`); // Chuyển đến trang Message với ID của chat
+    setOpen(false); // Đóng popup sau khi chọn chat
+  };
+
+  // Trạng thái mở của Popover
+  const [open, setOpen] = useState(false);
+
   return (
     <header
       className={twMerge(
@@ -54,22 +143,17 @@ function Header() {
         <div className="flex justify-end items-center gap-4">
           {isLoggedIn() ? (
             <>
-              <Popover>
+              <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger className="" asChild>
                   <Button variant="outline" size="icon" className="">
                     <MessageCircleMore />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="shadow-lg shadow-foreground/5 rounded-lg 
-                   w-screen md:w-96 lg:w-[500px]"
+                  className="shadow-lg shadow-foreground/5 
+                rounded-lg w-full max-w-md mx-auto h-[75vh] overflow-y-auto"
                 >
-                  <h3>Đoạn chat</h3>
-                  <Search />
-
-                  {/* <Tabs></Tabs> */}
-                  {/* message list */}
-                  <div>Danh sách đoạn Chat</div>
+                  <ChatList chats={dataChat} onChatSelect={handleChatSelect} />
                 </PopoverContent>
               </Popover>
 
