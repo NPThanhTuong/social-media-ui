@@ -1,38 +1,78 @@
-
-// import { Skeleton } from "@/components/ui/skeleton"
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import friendShipApi from "@/apis/friendShipApi"
 
 export default function Friends({ type, list, handleConfirm }) {
 
-    const handleConfirmRequest = async (e, id) => {
+    const handleAcceptRequest = async (e, id) => {
         e.preventDefault();
-        handleConfirm(id);
+        try {
+            await friendShipApi.acceptFriendRequest(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+            handleConfirm(id);
+        } catch (error) {
+            console.error("Lỗi khi chấp nhận yêu cầu:", error);
+        }
     };
 
     const handleDelete = async (e, id) => {
         e.preventDefault();
-        handleConfirm(id);
+        try {
+            if (type === "requestsSent") {
+                await friendShipApi.cancelFriendRequest(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+            } else {
+                await friendShipApi.removeFriend(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+            }
+            handleConfirm(id);
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error);
+        }
     };
 
     const renderFriendCard = (friend) => {
         const { id, name, avatar } = friend;
         return (
-            <Link to={`/profile/${id}`} key={id} className="border p-4 rounded-md shadow-md w-60 flex flex-col items-center m-2 ">
+            <Link
+                to={`/profile/${id}`}
+                key={id}
+                className="bg-white border border-gray-200 rounded-lg shadow-md p-4 w-60 flex flex-col items-center m-2"
+            >
                 <img src={avatar} alt={name} className="rounded-full w-20 h-20 object-cover mb-4" />
-                <span className="font-semibold">{name}</span>
-                {type === "requests" ? (
+                <span className="font-semibold text-gray-800">{name}</span>
+
+                {type === "friends" ? (
+                    <button
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-700 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                        onClick={(e) => handleDelete(e, id)}
+                    >
+                        Xóa bạn
+                    </button>
+                ) : type === "requests" ? (
                     <>
-                        <button className="bg-blue-500 text-white mt-2 px-4 py-1 rounded" onClick={(e) => handleConfirmRequest(e, id)}>Xác nhận</button>
-                        <button className="bg-gray-300 mt-2 px-4 py-1 rounded" onClick={(e) => handleDelete(e, id)}>Xóa</button>
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white mt-2 px-4 py-1 rounded transition-colors duration-200"
+                            onClick={(e) => handleAcceptRequest(e, id)}
+                        >
+                            Xác nhận
+                        </button>
+                        <button
+                            className="bg-gray-300 hover:bg-gray-400 text-gray-700 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                            onClick={(e) => handleDelete(e, id)}
+                        >
+                            Từ chối
+                        </button>
                     </>
                 ) : type === "requestsSent" ? (
-                    <button className="bg-gray-300 mt-2 px-4 py-1 rounded" onClick={(e) => handleDelete(e, id)}>Xóa</button>
+                    <button
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-700 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                        onClick={(e) => handleDelete(e, id)}
+                    >
+                        Xóa lời mời
+                    </button>
                 ) : null}
             </Link>
         );
     };
+
 
     if (!list) {
         return;
@@ -40,7 +80,7 @@ export default function Friends({ type, list, handleConfirm }) {
 
     return (
         <div className="flex flex-wrap justify-start">
-            {list.map(renderFriendCard)}
+            {list && list.map(renderFriendCard)}
         </div>
     );
 }
