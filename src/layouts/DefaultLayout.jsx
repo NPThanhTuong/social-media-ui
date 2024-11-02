@@ -6,7 +6,6 @@ function DefaultLayout() {
   return (
     <div>
       <Header />
-
       {/* main content */}
       <Outlet />
       <Toaster />

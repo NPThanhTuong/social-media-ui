@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import Comment from "@/components/Comment";
 import CommentForm from "./CommentForm";
 import { ScrollArea } from "./ui/scroll-area";
+import { useAuth } from "@/context/AuthContext";
 
 function CommentSystem({ postId }) {
   const [comments, setComments] = useState([]);
+  const { token, user } = useAuth();
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -15,14 +17,18 @@ function CommentSystem({ postId }) {
 
   useEffect(() => {
     if (scrollRef.current) {
-      console.log(scrollRef.current);
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [comments]);
 
   const fetchComments = async () => {
     try {
-      const response = await axiosInstance.get(`/comments/post/${postId}`); // Replace with your API endpoint
+      // Need change
+      const response = await axiosInstance.get(`/comments/post/${postId}`, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
       setComments(response.data);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -31,10 +37,18 @@ function CommentSystem({ postId }) {
 
   const handleAddComment = async (parentCommentId = null, replyContent) => {
     try {
-      const response = await axiosInstance.post(`comments/post/${postId}`, {
-        content: replyContent,
-        parentId: parseInt(parentCommentId),
-      });
+      const response = await axiosInstance.post(
+        `comments/post/${postId}`,
+        {
+          content: replyContent,
+          parentId: parseInt(parentCommentId),
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
       fetchComments(); // Refresh comments after adding
     } catch (error) {
       console.error("Error adding reply:", error);
@@ -43,9 +57,17 @@ function CommentSystem({ postId }) {
 
   const handleEditComment = async (commentId, newContent) => {
     try {
-      await axiosInstance.put(`/comments/${commentId}`, {
-        content: newContent,
-      });
+      await axiosInstance.put(
+        `/comments/${commentId}`,
+        {
+          content: newContent,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
       fetchComments(); // Refresh comments after editing
     } catch (error) {
       console.error("Error editing comment:", error);
@@ -54,7 +76,11 @@ function CommentSystem({ postId }) {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axiosInstance.delete(`/comments/${commentId}`);
+      await axiosInstance.delete(`/comments/${commentId}`, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
       fetchComments(); // Refresh comments after deleting
     } catch (error) {
       console.error("Error deleting comment:", error);

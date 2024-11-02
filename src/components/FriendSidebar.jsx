@@ -13,16 +13,22 @@ import { Gift } from "lucide-react";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/configs/axiosConfig";
 import Loading from "./Loading";
+import { useAuth } from "@/context/AuthContext";
 
 function FriendSidebar() {
   const [friends, setFriend] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   useEffect(() => {
     const getFriendsUser = async () => {
       try {
         // Need change
-        const res = await axiosInstance.get("/friends/1");
+        const res = await axiosInstance.get("/friends", {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
         setFriend(res.data);
         setLoading(false);
       } catch (error) {

@@ -16,8 +16,6 @@ function HomePage() {
       <div className="sticky top-20 hidden md:block md:w-4/12 lg:w-3/12  max-h-40">
         <FriendSidebar />
       </div>
-      
-      
     </div>
   );
 }
