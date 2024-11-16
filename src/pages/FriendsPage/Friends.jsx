@@ -7,7 +7,7 @@ export default function Friends({ type, list, handleConfirm }) {
     const handleAcceptRequest = async (e, id) => {
         e.preventDefault();
         try {
-            await friendShipApi.acceptFriendRequest(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+            await friendShipApi.acceptFriendRequest(id);
             handleConfirm(id);
         } catch (error) {
             console.error("Lỗi khi chấp nhận yêu cầu:", error);
@@ -18,13 +18,23 @@ export default function Friends({ type, list, handleConfirm }) {
         e.preventDefault();
         try {
             if (type === "requestsSent") {
-                await friendShipApi.cancelFriendRequest(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+                await friendShipApi.cancelFriendRequest(id);
             } else {
-                await friendShipApi.removeFriend(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+                await friendShipApi.removeFriend(id);
             }
             handleConfirm(id);
         } catch (error) {
             console.error("Lỗi khi xóa:", error);
+        }
+    };
+
+    const handleSendRequest = async (e, id) => {
+        e.preventDefault();
+        try {
+            await friendShipApi.sendFriendRequest(id);
+            handleConfirm(id); // Cập nhật danh sách
+        } catch (error) {
+            console.error("Lỗi khi gửi yêu cầu kết bạn:", error);
         }
     };
 
@@ -67,6 +77,13 @@ export default function Friends({ type, list, handleConfirm }) {
                         onClick={(e) => handleDelete(e, id)}
                     >
                         Xóa lời mời
+                    </button>
+                ) : type === "suggestions" ? (
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 text-white mt-2 px-4 py-1 rounded transition-colors duration-200"
+                        onClick={(e) => handleSendRequest(e, id)}
+                    >
+                        Kết bạn
                     </button>
                 ) : null}
             </Link>
