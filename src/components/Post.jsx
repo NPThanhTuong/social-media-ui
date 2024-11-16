@@ -43,6 +43,7 @@ import { twMerge } from "tailwind-merge";
 import { axiosInstance } from "@/configs/axiosConfig";
 import CommentSystem from "./CommentSystem";
 import { useAuth } from "@/context/AuthContext";
+import { Link } from "react-router-dom";
 
 function Post({
   id,
@@ -95,10 +96,12 @@ function Post({
       <CardHeader>
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage src={owner.avatar} />
-              <AvatarFallback className="bg-background">N/A</AvatarFallback>
-            </Avatar>
+            <Link to={`/profile/${owner.id}`}>
+              <Avatar>
+                <AvatarImage src={owner.avatar} />
+                <AvatarFallback className="bg-background">N/A</AvatarFallback>
+              </Avatar>
+            </Link>
             <div>
               <CardTitle className="text-base">{owner.name}</CardTitle>
               <CardDescription>
@@ -160,9 +163,8 @@ function Post({
               dynamicEl={images.map((image, index) => ({
                 src: image.path,
                 thumb: image.path,
-                subHtml: `<h4>Image ${index + 1} title</h4><p>Image ${
-                  index + 1
-                } descriptions.</p>`,
+                subHtml: `<h4>Image ${index + 1} title</h4><p>Image ${index + 1
+                  } descriptions.</p>`,
               }))}
             ></LightGallery>
           </div>

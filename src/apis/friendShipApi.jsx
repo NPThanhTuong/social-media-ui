@@ -39,7 +39,16 @@ const friendShipApi = {
         } catch (error) {
             console.error("Lỗi khi hủy lời mời:", error);
         }
-    }
+    },
+    async getFriends() {
+        try {
+            const data = await axiosInstance.get("/friends");
+            return data.data;
+        } catch (error) {
+            console.error({ error });
+            return null;
+        }
+    },
 };
 
 export default friendShipApi;
