@@ -7,7 +7,7 @@ const onecePage = 12;
 export default function Friends({ type, list, handleConfirm }) {
     const [visibleCount, setVisibleCount] = useState(onecePage); // Số phần tử hiển thị ban đầu
 
-    useEffect(() => { setVisibleCount(onecePage) }, [type])
+    useEffect(() => { setVisibleCount(onecePage) }, [type]);
 
     const handleAcceptRequest = async (e, id) => {
         e.preventDefault();
@@ -100,8 +100,18 @@ export default function Friends({ type, list, handleConfirm }) {
         setVisibleCount((prevCount) => prevCount + onecePage);
     };
 
-    if (!list) {
-        return null;
+    if (!list || list.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center text-gray-600 mt-16">
+                <i className="fas fa-user-friends text-blue-500 text-5xl mb-4"></i>
+                <p className="font-medium text-lg">
+                    Danh sách hiện đang trống!
+                </p>
+                <p className="text-sm text-gray-500">
+                    Hãy kết nối và mở rộng danh sách bạn bè ngay bây giờ.
+                </p>
+            </div>
+        );
     }
 
     return (
@@ -120,3 +130,4 @@ export default function Friends({ type, list, handleConfirm }) {
         </div>
     );
 }
+
