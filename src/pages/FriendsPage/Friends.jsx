@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import friendShipApi from "@/apis/friendShipApi"
+import friendShipApi from "@/apis/friendShipApi";
+
+const onecePage = 12;
 
 export default function Friends({ type, list, handleConfirm }) {
+    const [visibleCount, setVisibleCount] = useState(onecePage); // Số phần tử hiển thị ban đầu
+
+    useEffect(() => { setVisibleCount(onecePage) }, [type])
 
     const handleAcceptRequest = async (e, id) => {
         e.preventDefault();
         try {
-            await friendShipApi.acceptFriendRequest(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+            await friendShipApi.acceptFriendRequest(id);
             handleConfirm(id);
         } catch (error) {
             console.error("Lỗi khi chấp nhận yêu cầu:", error);
@@ -18,13 +23,23 @@ export default function Friends({ type, list, handleConfirm }) {
         e.preventDefault();
         try {
             if (type === "requestsSent") {
-                await friendShipApi.cancelFriendRequest(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+                await friendShipApi.cancelFriendRequest(id);
             } else {
-                await friendShipApi.removeFriend(1, id); // Thay thế `userId` (1) bằng ID của người dùng hiện tại.
+                await friendShipApi.removeFriend(id);
             }
             handleConfirm(id);
         } catch (error) {
             console.error("Lỗi khi xóa:", error);
+        }
+    };
+
+    const handleSendRequest = async (e, id) => {
+        e.preventDefault();
+        try {
+            await friendShipApi.sendFriendRequest(id);
+            handleConfirm(id); // Cập nhật danh sách
+        } catch (error) {
+            console.error("Lỗi khi gửi yêu cầu kết bạn:", error);
         }
     };
 
@@ -41,7 +56,7 @@ export default function Friends({ type, list, handleConfirm }) {
 
                 {type === "friends" ? (
                     <button
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-700 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                        className="bg-red-100 text-red-500 hover:bg-red-200 hover:text-red-600 mt-2 px-4 py-1 rounded transition-colors duration-200"
                         onClick={(e) => handleDelete(e, id)}
                     >
                         Xóa bạn
@@ -49,13 +64,13 @@ export default function Friends({ type, list, handleConfirm }) {
                 ) : type === "requests" ? (
                     <>
                         <button
-                            className="bg-blue-500 hover:bg-blue-600 text-white mt-2 px-4 py-1 rounded transition-colors duration-200"
+                            className="bg-blue-500 text-white hover:bg-blue-600 mt-2 px-4 py-1 rounded transition-colors duration-200"
                             onClick={(e) => handleAcceptRequest(e, id)}
                         >
                             Xác nhận
                         </button>
                         <button
-                            className="bg-gray-300 hover:bg-gray-400 text-gray-700 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                            className="bg-red-100 text-red-500 hover:bg-red-200 hover:text-red-600 mt-2 px-4 py-1 rounded transition-colors duration-200"
                             onClick={(e) => handleDelete(e, id)}
                         >
                             Từ chối
@@ -63,24 +78,45 @@ export default function Friends({ type, list, handleConfirm }) {
                     </>
                 ) : type === "requestsSent" ? (
                     <button
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-700 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                        className="bg-red-100 text-red-500 hover:bg-red-200 hover:text-red-600 mt-2 px-4 py-1 rounded transition-colors duration-200"
                         onClick={(e) => handleDelete(e, id)}
                     >
                         Xóa lời mời
                     </button>
+                ) : type === "suggestions" ? (
+                    <button
+                        className="bg-blue-500 text-white hover:bg-blue-600 mt-2 px-4 py-1 rounded transition-colors duration-200"
+                        onClick={(e) => handleSendRequest(e, id)}
+                    >
+                        Kết bạn
+                    </button>
                 ) : null}
+
             </Link>
         );
     };
 
+    const handleLoadMore = () => {
+        setVisibleCount((prevCount) => prevCount + onecePage);
+    };
 
     if (!list) {
-        return;
+        return null;
     }
 
     return (
-        <div className="flex flex-wrap justify-start">
-            {list && list.map(renderFriendCard)}
+        <div>
+            <div className="flex flex-wrap justify-start">
+                {list.slice(0, visibleCount).map(renderFriendCard)}
+            </div>
+            {visibleCount < list.length && (
+                <button
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-4 block mx-auto"
+                    onClick={handleLoadMore}
+                >
+                    Xem thêm
+                </button>
+            )}
         </div>
     );
 }

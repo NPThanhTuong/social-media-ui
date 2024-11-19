@@ -1,7 +1,8 @@
 import {
   Users,
   UserSearch,
-  Send
+  Send,
+  UserRoundPlus
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -19,12 +20,17 @@ const relationShipMenu = [
   {
     label: "Lời mời kết bạn",
     path: "/user/friends/requests",
-    icon: UserSearch
+    icon: UserRoundPlus
   },
   {
     label: "Lời mời đã gửi",
     path: "/user/friends/requestsSent",
     icon: Send
+  },
+  {
+    label: "Gợi ý kết bạn",
+    path: "/user/friends/suggestions",
+    icon: UserSearch
   }
 ]
 
@@ -36,9 +42,14 @@ function FriendsPage() {
   }, [page]);
 
   async function fetchRelationship() {
-    const data = await friendShipApi.getALL(1); // Thay `1` bằng ID của người dùng hiện tại.
-    console.log(data);
-    setFriendData(data[page] || [])
+    let data;
+    if (page === "suggestions") {
+      data = await friendShipApi.getSuggestedFriends();
+      setFriendData(data);
+    } else {
+      data = await friendShipApi.getALL();
+      setFriendData(data[page] || []);
+    }
   }
 
   async function handleConfirm(id) {
@@ -47,10 +58,6 @@ function FriendsPage() {
     })
     setFriendData(newData)
   }
-
-  // async function handleConfirm(id) {
-  //   setFriendData(prevData => prevData.filter(friend => friend.id !== id));
-  // }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -74,5 +81,3 @@ function FriendsPage() {
 }
 
 export default FriendsPage;
-
-
