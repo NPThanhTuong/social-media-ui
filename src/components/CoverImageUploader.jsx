@@ -23,7 +23,7 @@ const CoverImageUploader = ({ coverImage, onCoverImageChange }) => {
             htmlFor="cover-image-upload"
             className="text-white px-4 py-2 rounded cursor-pointer hover:bg-opacity-70"
           >
-            Thay đổi ảnh bìa
+            {/* Thay đổi ảnh bìa */}
           </label>
           <input
             type="file"

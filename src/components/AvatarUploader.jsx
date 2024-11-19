@@ -28,11 +28,11 @@ const AvatarUploader = ({ avatar, onAvatarChange }) => {
         <div className="absolute bottom-0 left-0 w-full h-1/3 flex items-center justify-center text-white text-center rounded-b-full cursor-pointer">
           <label htmlFor="avatar-image-upload" className="flex flex-col items-center justify-center">
             <div className="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7-7h4l7 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 21h8M12 17a4 4 0 110-8 4 4 0 010 8z" />
-              </svg>
-              <span className="font-bold text-blue-500">Edit</span>
+              </svg> */}
+              {/* <span className="font-bold text-blue-500">Edit</span> */}
             </div>
           </label>
           <input
@@ -44,7 +44,7 @@ const AvatarUploader = ({ avatar, onAvatarChange }) => {
           />
         </div>
       )}
-      
+
       {isAvatarOpen && (
         <div className="fixed inset-0 flex justify-center items-center z-50">
           <div className="relative">
