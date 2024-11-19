@@ -1,9 +1,12 @@
 import { axiosInstance } from "@/configs/axiosConfig"
 
+const token = localStorage.getItem("token");
+axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
 const friendShipApi = {
-    async getALL(userId) {
+    async getALL() {
         try {
-            const data = await axiosInstance.get("/friends/relationship/" + userId);
+            const data = await axiosInstance.get("/friends/relationship");
             return data.data;
         } catch (error) {
             console.error(error);
@@ -12,9 +15,9 @@ const friendShipApi = {
     },
 
     // Chấp nhận yêu cầu kết bạn
-    async acceptFriendRequest(userId, requesterId) {
+    async acceptFriendRequest(requesterId) {
         try {
-            await axiosInstance.post(`/friends/accept/${userId}/${requesterId}`);
+            await axiosInstance.post(`/friends/accept/${requesterId}`);
             alert("Đã chấp nhận lời mời kết bạn!");
         } catch (error) {
             console.error("Lỗi khi chấp nhận yêu cầu kết bạn:", error);
@@ -22,9 +25,9 @@ const friendShipApi = {
     },
 
     // Xóa bạn hoặc từ chối yêu cầu kết bạn
-    async removeFriend(userId, friendId) {
+    async removeFriend(friendId) {
         try {
-            await axiosInstance.delete(`/friends/remove/${userId}/${friendId}`);
+            await axiosInstance.delete(`/friends/remove/${friendId}`);
             alert("Đã xóa bạn thành công!");
         } catch (error) {
             console.error("Lỗi khi xóa bạn:", error);
@@ -32,9 +35,9 @@ const friendShipApi = {
     },
 
     // Hủy lời mời kết bạn đã gửi
-    async cancelFriendRequest(userId, friendId) {
+    async cancelFriendRequest(friendId) {
         try {
-            await axiosInstance.delete(`/friends/cancel/${userId}/${friendId}`);
+            await axiosInstance.delete(`/friends/cancel/${friendId}`);
             alert("Đã hủy lời mời kết bạn!");
         } catch (error) {
             console.error("Lỗi khi hủy lời mời:", error);
@@ -49,6 +52,26 @@ const friendShipApi = {
             return null;
         }
     },
+
+    async getSuggestedFriends() {
+        try {
+            const data = await axiosInstance.get(`/friends/suggestions`);
+            return data.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy gợi ý kết bạn:", error);
+            return [];
+        }
+    },
+
+    // Gửi lời mời kết bạn
+    async sendFriendRequest(receiverId) {
+        try {
+            await axiosInstance.post(`/friends/send-request/${receiverId}`);
+            alert("Đã gửi lời mời kết bạn!");
+        } catch (error) {
+            console.error("Lỗi khi gửi lời mời kết bạn:", error);
+        }
+    }
 };
 
 export default friendShipApi;
