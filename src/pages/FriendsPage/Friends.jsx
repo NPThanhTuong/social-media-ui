@@ -22,7 +22,7 @@ export default function Friends({ type, list, handleConfirm }) {
     const handleDelete = async (e, id) => {
         e.preventDefault();
         try {
-            if (type === "requestsSent") {
+            if (type === "requestsSent" || type === "requests") {
                 await friendShipApi.cancelFriendRequest(id);
             } else {
                 await friendShipApi.removeFriend(id);

@@ -189,7 +189,7 @@ function Header() {
                     <Link to="/profile">Hồ sơ</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/user/friends">Bạn bè</Link>
+                    <Link to="/user/friends/friends">Bạn bè</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <div onClick={handleLogout}>Đăng xuất</div>
