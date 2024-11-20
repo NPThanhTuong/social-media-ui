@@ -24,7 +24,7 @@ const friendShipApi = {
         }
     },
 
-    // Xóa bạn hoặc từ chối yêu cầu kết bạn
+    // Xóa bạn 
     async removeFriend(friendId) {
         try {
             await axiosInstance.delete(`/friends/remove/${friendId}`);
@@ -34,13 +34,13 @@ const friendShipApi = {
         }
     },
 
-    // Hủy lời mời kết bạn đã gửi
+    // Xóa lời mời kết bạn đã gửi hoặc từ chối yêu cầu kết bạn
     async cancelFriendRequest(friendId) {
         try {
             await axiosInstance.delete(`/friends/cancel/${friendId}`);
-            alert("Đã hủy lời mời kết bạn!");
+            alert("Đã xóa lời mời kết bạn!");
         } catch (error) {
-            console.error("Lỗi khi hủy lời mời:", error);
+            console.error("Lỗi khi xóa lời mời:", error);
         }
     },
     async getFriends() {
