@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useAuth } from "@/context/AuthContext";
+import { axiosInstance } from "@/configs/axiosConfig";
 
 const ChatList = ({ chats, onChatSelect }) => {
-  const ids = chats.map((chat) => chat.id);
-  const hasDuplicates = ids.length !== new Set(ids).size;
+  // const ids = chats.map((chat) => chat.id);
+  // const hasDuplicates = ids.length !== new Set(ids).size;
 
-  if (hasDuplicates) {
-    console.error("Có id trùng lặp trong danh sách chats.");
-  }
+  // if (hasDuplicates) {
+  //   console.error("Có id trùng lặp trong danh sách chats.");
+  // }
 
   return (
     <div className="w-96 h-full flex flex-col">
@@ -41,11 +43,11 @@ const ChatList = ({ chats, onChatSelect }) => {
               className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg cursor-pointer"
             >
               <div className="relative w-12 h-12 mr-3 flex-shrink-0 flex items-center justify-center">
-                {chat.type === "group" ? (
+                {/* {chat.type === "group" ? (
                   <div className="relative w-12 h-12">
-                    <div className="absolute top-0 right-0">
-                      {/* Avatar thứ nhất (chat nhóm) */}
-                      <Avatar className="w-8 h-8 rounded-full border-2 border-gray">
+                    <div className="absolute top-0 right-0"> */}
+                {/* Avatar thứ nhất (chat nhóm) */}
+                {/* <Avatar className="w-8 h-8 rounded-full border-2 border-gray">
                         <AvatarImage
                           src={chat.avatars[0]}
                           className="rounded-full border-2 border-white"
@@ -55,9 +57,9 @@ const ChatList = ({ chats, onChatSelect }) => {
                         </AvatarFallback>
                       </Avatar>
                     </div>
-                    <div className="absolute bottom-0 left-0">
-                      {/* Avatar thứ hai (chat nhóm) */}
-                      <Avatar className="w-8 h-8 rounded-full border-2 border-gray">
+                    <div className="absolute bottom-0 left-0"> */}
+                {/* Avatar thứ hai (chat nhóm) */}
+                {/* <Avatar className="w-8 h-8 rounded-full border-2 border-gray">
                         <AvatarImage
                           src={chat.avatars[1]}
                           className="rounded-full border-2 border-white"
@@ -68,23 +70,25 @@ const ChatList = ({ chats, onChatSelect }) => {
                       </Avatar>
                     </div>
                   </div>
-                ) : (
-                  // Avatar chat riêng
-                  <Avatar>
-                    <AvatarImage src={chat.avatar} />
-                    <AvatarFallback className="bg-background">
-                      N/A
-                    </AvatarFallback>
-                  </Avatar>
-                )}
+                ) : ( */}
+                {/* // Avatar chat riêng */}
+                <Avatar>
+                  <AvatarImage src={chat.users[0].avatar} />
+                  <AvatarFallback className="bg-background">N/A</AvatarFallback>
+                </Avatar>
+                {/* )} */}
               </div>
               <div className="flex-1 flex flex-col justify-center ml-2">
-                <div className="font-semibold">{chat.userName}</div>
+                <div className="font-semibold">{chat.users[0].name}</div>
                 <div className="text-sm text-gray-500 truncate">
-                  {chat.lastMessage}
+                  {chat.messages[chat.messages.length - 1].content}
                 </div>
               </div>
-              <div className="text-xs text-gray-400 ml-auto">{chat.time}</div>
+              <div className="text-xs text-gray-400 ml-auto">
+                {new Date(
+                  chat.messages[chat.messages.length - 1].sentAt
+                ).toLocaleTimeString()}
+              </div>
             </div>
           ))
         )}

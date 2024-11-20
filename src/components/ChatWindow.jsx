@@ -8,23 +8,36 @@ import {
   DropdownMenuItem,
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
+import { axiosInstance } from "@/configs/axiosConfig";
 
-const ChatWindow = ({ chat }) => {
+const ChatWindow = ({ chat, sendMessage, messages, setMessages }) => {
   const [inputMessage, setInputMessage] = useState("");
   const chatContainerRef = useRef(null);
+  const { user } = useAuth();
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
+      // const newMessage = {
+      //   sender: "Bạn",
+      //   text: inputMessage,
+      //   timestamp: Date.now(),
+      //   status: "Đã gửi",
+      // };
       const newMessage = {
-        sender: "Bạn",
-        text: inputMessage,
-        timestamp: Date.now(),
-        status: "Đã gửi",
+        senderId: user.id,
+        recipientId: chat.users[0].id,
+        content: inputMessage,
       };
 
       // Gửi tin nhắn qua WebSocket hoặc cập nhật local data
       if (chat) {
-        chat.messages.push(newMessage);
+        // messages.push(newMessage);
+        sendMessage(newMessage);
+        setMessages((prev) => [
+          ...prev,
+          { ...newMessage, roomId: chat.id, sentAt: Date.now() },
+        ]);
       }
       setInputMessage("");
 
@@ -43,9 +56,9 @@ const ChatWindow = ({ chat }) => {
         chatContainerRef.current.scrollHeight -
         chatContainerRef.current.clientHeight;
     }
-  }, [chat.messages.length]);
+  }, [messages]);
 
-  if (!chat || chat.messages.length === 0) {
+  if (!chat || messages?.length === 0) {
     return null;
   }
 
@@ -54,26 +67,26 @@ const ChatWindow = ({ chat }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b rounded-t-lg">
         <div className="flex items-center">
-          {chat.type === "group" ? (
+          {/* {chat.type === "group" ? (
             <div className="relative w-10 h-10">
               <Avatar className="absolute w-8 h-8 rounded-full border-2 border-gray right-0 top-0">
                 <AvatarImage src={chat.avatars[0]} />
                 <AvatarFallback className="bg-background">N/A</AvatarFallback>
-              </Avatar>
-              {/* Avatar thứ hai */}
-              <Avatar className="absolute w-8 h-8 rounded-full border-2 border-gray left-0 bottom-0">
+              </Avatar> */}
+          {/* Avatar thứ hai */}
+          {/* <Avatar className="absolute w-8 h-8 rounded-full border-2 border-gray left-0 bottom-0">
                 <AvatarImage src={chat.avatars[1]} />
                 <AvatarFallback className="bg-background">N/A</AvatarFallback>
               </Avatar>
             </div>
-          ) : (
-            <Avatar className="w-10 h-10 rounded-full mr-3">
-              <AvatarImage src={chat.avatar} />
-              <AvatarFallback className="bg-background">N/A</AvatarFallback>
-            </Avatar>
-          )}
+          ) : ( */}
+          <Avatar className="w-10 h-10 rounded-full mr-3">
+            <AvatarImage src={chat.users[0].avatar} />
+            <AvatarFallback className="bg-background">N/A</AvatarFallback>
+          </Avatar>
+          {/* )} */}
           <div className="ml-3">
-            <div className="font-semibold text-lg">{chat.userName}</div>
+            <div className="font-semibold text-lg">{chat.users[0].name}</div>
           </div>
         </div>
         <div className="flex items-center gap-2 pr-7">
@@ -89,14 +102,14 @@ const ChatWindow = ({ chat }) => {
         className="flex-1 p-4 overflow-y-auto"
         style={{ maxHeight: "calc(100vh - 220px)" }}
       >
-        {chat.messages.map((msg, index) => (
+        {messages?.map((msg, index) => (
           <React.Fragment key={index}>
             {/* Hiển thị dòng thời gian nếu cần */}
             {index === 0 ||
-            new Date(msg.timestamp).toDateString() !==
-              new Date(chat.messages[index - 1].timestamp).toDateString() ? (
+            new Date(msg.sentAt).toDateString() !==
+              new Date(messages[index - 1].sentAt).toDateString() ? (
               <div className="text-center my-4 text-sm text-gray-500">
-                {new Date(msg.timestamp).toLocaleDateString("vi-VN", {
+                {new Date(msg.sentAt).toLocaleDateString("vi-VN", {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
@@ -107,28 +120,30 @@ const ChatWindow = ({ chat }) => {
             {/* Tin nhắn */}
             <div
               className={`flex items-end gap-2 ${
-                msg.sender === "Bạn" ? "justify-end" : "justify-start"
-              } ${index === chat.messages.length - 1 ? "mb-6" : "mb-2"}`}
+                msg.senderId === user.id ? "justify-end" : "justify-start"
+              } ${index === messages.length - 1 ? "mb-6" : "mb-2"}`}
             >
               {/* Avatar của người gửi, chỉ hiển thị nếu người gửi không phải là "Bạn" */}
-              {msg.sender !== "Bạn" && (
+              {msg.senderId !== user.id && (
                 <Avatar>
-                  <AvatarImage src={msg.avatar} />
+                  <AvatarImage src={chat.users[0].avatar} />
                   <AvatarFallback>N/A</AvatarFallback>
                 </Avatar>
               )}
 
               {/* Hộp tin nhắn và Dropdown Menu */}
               <div className="flex flex-col max-w-xs">
-                {msg.sender !== "Bạn" && (
+                {/* 
+                {msg.senderId !== user.id && (
                   <span className="font-semibold text-gray-800 dark:text-gray-200">
-                    {msg.sender}
+                    {msg.senderId}
                   </span>
                 )}
+                  */}
 
                 <div className="flex items-center gap-2">
                   {/* Dropdown Menu cho người gửi "Bạn", hiển thị bên trái */}
-                  {msg.sender === "Bạn" && (
+                  {msg.senderId === user.id && (
                     <DropdownMenu>
                       <DropdownMenuTrigger className="focus:outline-none cursor-pointer p-1 rounded-full transition duration-200 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md">
                         <EllipsisVertical />
@@ -150,14 +165,14 @@ const ChatWindow = ({ chat }) => {
                   {/* Nội dung tin nhắn */}
                   <div
                     className={`${
-                      msg.sender === "Bạn"
+                      msg.senderId === user.id
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     } rounded-2xl p-3 shadow-md relative`}
                   >
-                    <p>{msg.text}</p>
+                    <p>{msg.content}</p>
                     <span className="text-xs text-gray-600 dark:text-white">
-                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                      {new Date(msg.sentAt).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -166,15 +181,15 @@ const ChatWindow = ({ chat }) => {
                 </div>
 
                 {/* Dòng trạng thái nếu người gửi là "Bạn" */}
-                {msg.sender === "Bạn" && (
+                {/* {msg.senderId === user.id && (
                   <span className="text-xs text-gray-500 mt-1 ml-16">
-                    {msg.status}
+                    {msg.isRead ? "Đã xem" : "Chưa xem"}
                   </span>
-                )}
+                )}*/}
               </div>
 
               {/* Nếu người gửi không phải là "Bạn", Dropdown Menu xuất hiện sau hộp tin nhắn */}
-              {msg.sender !== "Bạn" && (
+              {msg.senderId !== user.id && (
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     className="focus:outline-none ml-2 cursor-pointer p-1 
@@ -214,6 +229,7 @@ const ChatWindow = ({ chat }) => {
           />
 
           <button
+            // onClick={sendMessage}
             onClick={handleSendMessage}
             className="p-2 hover:bg-gray-200 rounded-full"
           >
