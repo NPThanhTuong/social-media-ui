@@ -6,8 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 
 const initialContext = {
   user: {
-    useId: null,
+    id: null,
     name: null,
+    email: null,
     role: null,
     avatar: null,
   },

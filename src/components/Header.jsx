@@ -23,82 +23,83 @@ import Search from "@/components/Search";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ChatList from "@/components/ChatList";
+import { axiosInstance } from "@/configs/axiosConfig";
 
 // Dữ liệu mẫu cho danh sách chat
-const dataChat = [
-  {
-    id: 1,
-    userName: "Người dùng B",
-    lastMessage: "Tin nhắn cuối!",
-    time: "12:00",
-    avatar: "https://api.multiavatar.com/user10.svg",
-    type: "private",
-    messages: [
-      {
-        sender: "Người dùng B",
-        text: "Chào bạn!",
-        timestamp: "2024-10-27T15:30:00.000Z",
-        avatar: "https://api.multiavatar.com/user10.svg",
-      },
-      {
-        sender: "Bạn",
-        text: "Xin chào, bạn có khỏe không?",
-        timestamp: "2024-10-27T15:32:00.000Z",
-      },
-      {
-        sender: "Người dùng B",
-        text: "Tôi khỏe, cảm ơn bạn! Bạn thì sao?",
-        timestamp: "2024-10-27T15:35:00.000Z",
-        avatar: "https://api.multiavatar.com/user10.svg",
-      },
-      {
-        sender: "Bạn",
-        text: "Tôi cũng khỏe. Cảm ơn bạn đã hỏi!",
-        timestamp: "2024-10-28T09:00:00.000Z",
-      },
-      {
-        sender: "Người dùng B",
-        text: "Hẹn gặp lại!",
-        timestamp: "2024-10-28T09:05:00.000Z",
-        avatar: "https://api.multiavatar.com/user10.svg",
-      },
-    ],
-  },
-  {
-    id: 2,
-    userName: "Nhóm B",
-    lastMessage: "Tin nhắn cuối cùng",
-    time: "12:19",
-    avatars: [
-      //   "https://api.multiavatar.com/user3.svg",
-      //   "https://api.multiavatar.com/user14.svg",
-    ],
-    messages: [
-      {
-        sender: "Người dùng 1",
-        text: "Chào mọi người!",
-        timestamp: "2024-10-28T15:30:00.000Z",
-        avatar: "https://api.multiavatar.com/user3.svg",
-      },
-      {
-        sender: "Người dùng 2",
-        text: "Chào bạn!",
-        timestamp: "2024-10-28T15:30:00.000Z",
-        avatar: "https://api.multiavatar.com/user14.svg",
-      },
-      {
-        sender: "Người dùng 1",
-        text: "Có ai muốn đi ăn trưa không?",
-        timestamp: "2024-10-28T15:30:00.000Z",
-        avatar: "https://api.multiavatar.com/user4.svg",
-      },
-    ],
-    type: "group",
-  },
-];
+// const dataChat = [
+//   {
+//     id: 1,
+//     userName: "Người dùng B",
+//     lastMessage: "Tin nhắn cuối!",
+//     time: "12:00",
+//     avatar: "https://api.multiavatar.com/user10.svg",
+//     type: "private",
+//     messages: [
+//       {
+//         sender: "Người dùng B",
+//         text: "Chào bạn!",
+//         timestamp: "2024-10-27T15:30:00.000Z",
+//         avatar: "https://api.multiavatar.com/user10.svg",
+//       },
+//       {
+//         sender: "Bạn",
+//         text: "Xin chào, bạn có khỏe không?",
+//         timestamp: "2024-10-27T15:32:00.000Z",
+//       },
+//       {
+//         sender: "Người dùng B",
+//         text: "Tôi khỏe, cảm ơn bạn! Bạn thì sao?",
+//         timestamp: "2024-10-27T15:35:00.000Z",
+//         avatar: "https://api.multiavatar.com/user10.svg",
+//       },
+//       {
+//         sender: "Bạn",
+//         text: "Tôi cũng khỏe. Cảm ơn bạn đã hỏi!",
+//         timestamp: "2024-10-28T09:00:00.000Z",
+//       },
+//       {
+//         sender: "Người dùng B",
+//         text: "Hẹn gặp lại!",
+//         timestamp: "2024-10-28T09:05:00.000Z",
+//         avatar: "https://api.multiavatar.com/user10.svg",
+//       },
+//     ],
+//   },
+//   {
+//     id: 2,
+//     userName: "Nhóm B",
+//     lastMessage: "Tin nhắn cuối cùng",
+//     time: "12:19",
+//     avatars: [
+//       //   "https://api.multiavatar.com/user3.svg",
+//       //   "https://api.multiavatar.com/user14.svg",
+//     ],
+//     messages: [
+//       {
+//         sender: "Người dùng 1",
+//         text: "Chào mọi người!",
+//         timestamp: "2024-10-28T15:30:00.000Z",
+//         avatar: "https://api.multiavatar.com/user3.svg",
+//       },
+//       {
+//         sender: "Người dùng 2",
+//         text: "Chào bạn!",
+//         timestamp: "2024-10-28T15:30:00.000Z",
+//         avatar: "https://api.multiavatar.com/user14.svg",
+//       },
+//       {
+//         sender: "Người dùng 1",
+//         text: "Có ai muốn đi ăn trưa không?",
+//         timestamp: "2024-10-28T15:30:00.000Z",
+//         avatar: "https://api.multiavatar.com/user4.svg",
+//       },
+//     ],
+//     type: "group",
+//   },
+// ];
 
 function Header() {
-  const { user, logout, isLoggedIn } = useAuth();
+  const { user, logout, isLoggedIn, token } = useAuth();
 
   const { theme } = useTheme(); // Get the current theme (light, dark, system)
 
@@ -126,6 +127,23 @@ function Header() {
 
   // Trạng thái mở của Popover
   const [open, setOpen] = useState(false);
+  const [chats, setChats] = useState([]);
+
+  useEffect(() => {
+    const getChatRooms = async () => {
+      const res = await axiosInstance.get("rooms", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const { result } = res.data;
+
+      setChats(result);
+    };
+
+    getChatRooms();
+  }, []);
 
   return (
     <header
@@ -153,7 +171,7 @@ function Header() {
                   className="shadow-lg shadow-foreground/5 
                 rounded-lg w-full max-w-md mx-auto h-[75vh] overflow-y-auto"
                 >
-                  <ChatList chats={dataChat} onChatSelect={handleChatSelect} />
+                  <ChatList chats={chats} onChatSelect={handleChatSelect} />
                 </PopoverContent>
               </Popover>
 
