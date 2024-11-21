@@ -11,6 +11,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import AuthLayout from "@/layouts/AuthLayout";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import { AuthProvider } from "@/context/AuthContext";
+import UserProfilePage from "./pages/UserProfilePage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route element={<DefaultLayout />}>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/profile" element={<UserPage />} />
+                <Route path="/profile/:userId" element={<UserProfilePage />} />
                 <Route path="/user/friends/:page" element={<FriendsPage />} />
                 <Route path="/messages" element={<MessagesPage />} />
               </Route>
