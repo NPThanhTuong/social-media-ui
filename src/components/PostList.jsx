@@ -4,7 +4,7 @@ import { axiosInstance } from "@/configs/axiosConfig";
 import Loading from "./Loading";
 import { useAuth } from "@/context/AuthContext";
 
-function PostList() {
+function PostList({ postHref }) {
   const [posts, setPosts] = useState([]);
   const [likedPostId, setLikedPostId] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ function PostList() {
     const getData = async () => {
       try {
         // Need change
-        const resPost = await axiosInstance.get(`posts/friends`, {
+        const resPost = await axiosInstance.get(postHref, {
           headers: {
             Authorization: "Bearer " + token,
           },

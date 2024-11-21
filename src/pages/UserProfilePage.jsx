@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import AvatarUploader from "./AvatarUploader";
-import CoverImageUploader from "./CoverImageUploader";
-import UserNavigation from "./UserNavigation";
-import UserInfo from "./UserInfo";
-import PostList from "./PostList";
-import ImageGallery from "./ImageGallery";
-import ImageUploader from "./ImageUploader";
-import Friends from "../pages/FriendsPage/Friends";
-import userApi from "@/apis/user.api";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import friendShipApi from "@/apis/friendShipApi";
+import userApi from "@/apis/user.api";
+import PostList from "@/components/PostList";
+import UserInfo from "@/components/UserInfo";
+import UserNavigation from "@/components/UserNavigation";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Friends from "./FriendsPage/Friends";
+import ImageGallery from "@/components/ImageGallery";
+import ImageUploader from "@/components/ImageUploader";
+import CoverImageUploader from "@/components/CoverImageUploader";
+import AvatarUploader from "@/components/AvatarUploader";
 
-const UserProfile = () => {
+const UserProfilePage = () => {
   const [user, setUser] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
   const [newAvatar, setNewAvatar] = useState(null);
@@ -23,6 +23,7 @@ const UserProfile = () => {
     phone: "",
   });
   const [friends, setFriends] = useState([]);
+  const { userId } = useParams();
 
   useEffect(() => {
     fetchUser();
@@ -30,14 +31,14 @@ const UserProfile = () => {
   }, []);
 
   async function fetchFriends() {
-    const friendsData = await friendShipApi.getFriends();
+    const friendsData = await friendShipApi.getFriendsDetailUser(userId);
     if (!friendsData) return;
     setFriends(friendsData);
   }
 
   async function fetchUser() {
     try {
-      const userData = await userApi.getInfo();
+      const userData = await userApi.getDetailInfo(userId);
       setUser(userData.result);
       setCoverImage(userData.result.coverImage);
       setNewAvatar(userData.result.avatar);
@@ -102,7 +103,7 @@ const UserProfile = () => {
                   <h2 className="text-2xl font-bold text-gray-800">
                     {user.name}
                   </h2>
-                  <div className="flex gap-4 mt-2">
+                  {/* <div className="flex gap-4 mt-2">
                     <button
                       onClick={() => setShowModal(true)}
                       className="flex items-center bg-gray-200 hover:bg-gray-300 text-black font-medium px-4 py-2 rounded-lg shadow-sm transition duration-300 ease-in-out"
@@ -110,7 +111,7 @@ const UserProfile = () => {
                       <PencilSquareIcon className="w-5 h-5 mr-2" />
                       Cập nhật trang cá nhân
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -125,7 +126,7 @@ const UserProfile = () => {
           <div className="mt-8 container mx-auto">
             {activeTab === "Timeline" && (
               <div>
-                <PostList postHref="posts" />
+                <PostList postHref={`posts/users/${userId}`} />
               </div>
             )}
             {activeTab === "Profile" && (
@@ -133,13 +134,13 @@ const UserProfile = () => {
                 <UserInfo user={user} />
               </div>
             )}
-            {activeTab === "Friends" && (
+            {/* {activeTab === "Friends" && (
               <Friends type="friends" key="friend" list={friends} />
-            )}
-            {activeTab === "Photos" && (
+            )} */}
+            {/* {activeTab === "Photos" && (
               // <div className="text-gray-700">Hiển thị album ảnh ở đây...</div>
               <ImageGallery />
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -261,4 +262,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default UserProfilePage;
